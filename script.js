@@ -35,6 +35,20 @@ function removeFromLocalStorage(text) {
   localStorage.setItem("transactions", JSON.stringify(editedTransactions));
 }
 
+function formatAmount(amount) {
+  let formattedAmount;
+  if (amount > 0) {
+    formattedAmount = `+$${amount.toFixed(2).toLocaleString("en-US")}`;
+  } else if (amount < 0) {
+    formattedAmount = `-$${Math.abs(amount)
+      .toFixed(2)
+      .toLocaleString("en-US")}`;
+  } else {
+    formattedAmount = "$0";
+  }
+  return formattedAmount;
+}
+
 function updateStats(transactions) {
   const expenses = transactions.reduce((acc, curr) => {
     if (curr.type === "expense") {
@@ -49,9 +63,9 @@ function updateStats(transactions) {
     return acc;
   }, 0);
   const calculatedBalance = income + expenses;
-  moneyMinus.textContent = `-$${expenses * -1}`;
-  moneyPlus.textContent = `$${income}`;
-  balance.textContent = `$${calculatedBalance}`;
+  moneyMinus.textContent = formatAmount(expenses);
+  moneyPlus.textContent = formatAmount(income);
+  balance.textContent = formatAmount(calculatedBalance);
 }
 
 function displayTransactions() {
@@ -60,9 +74,9 @@ function displayTransactions() {
     .map(
       (transaction) =>
         `<li class="${transaction.type === "expense" ? "minus" : "plus"}">
-    ${transaction.text} <span>$${
+    ${transaction.text} <span>${formatAmount(
           transaction.amount
-        }</span><button class="delete-btn">x</button>
+        )}</span><button class="delete-btn">x</button>
     </li>`
     )
     .join("");
